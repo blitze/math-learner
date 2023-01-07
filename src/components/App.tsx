@@ -1,197 +1,158 @@
 import React from "react";
 import logo from "./logo.svg";
-import Problem from "./problem";
+
 import {
-	incorrectOptions,
-	RandomItem,
-	successOptions,
-	updateStats,
+	defaultGameData,
+	GAME_STATUS,
+	// incorrectOptions,
+	// RandomItem,
+	// successOptions,
+	// updateStats,
 	viewOptions,
 } from "../utils";
-import { FaPlay, FaStop } from "react-icons/fa";
-import { Settings, Stats } from "../types";
+// import { FaPlay, FaStop } from "react-icons/fa";
+import type { GameData, Profiles } from "../types";
 import SettingsView from "./Settings";
-import GameStats from "./GameStats";
-import Countdown from "react-countdown";
-
-const defaultSettings = {
-	modes: [],
-	baseNums: [],
-	maxNum: 12,
-	timer: "none",
-	maxTime: 1,
-	multipleChoice: true,
-};
+import ProfilesView from "./Profiles";
+// import GameStats from "./GameStats";
+// import Countdown from "react-countdown";
+import UsersView from "./UsersView";
+import Game from "./Game";
+import { useLocalStorage } from "usehooks-ts";
+import StatsView from "./StatsView";
+import Feedback from "./Feedback";
 
 function App(): JSX.Element {
-	const [settings, setSettings] = React.useState<Settings>(defaultSettings);
-	const [score, setScore] = React.useState({ count: 0, points: 0 });
-	const [attempts, setAttempts] = React.useState(0);
-	const [isCorrectAnswer, setIsCorrectAnswer] = React.useState(false);
-	const [newProblem, setNewProblem] = React.useState(false);
-	const [showMessage, setShowMessage] = React.useState(false);
-	const [showAnswer, setShowAnswer] = React.useState(false);
-	const [started, setStarted] = React.useState(false);
-	const [stats, setStats] = React.useState<Stats>({});
-	const [view, setView] = React.useState(() =>
-		settings.baseNums.length > 0 ? "Game" : "Settings"
-	);
+	const [user, setUser] = React.useState("");
+	const [profiles, setProfiles] = useLocalStorage<Profiles>("profiles", {});
+	const [view, setView] = React.useState("Game");
+	const [gameData, setGameData] = React.useState<GameData>(defaultGameData);
+
+	const settings = profiles && profiles[user];
+	const usersList = Object.keys(profiles);
 
 	React.useEffect(() => {
-		setShowMessage(!!attempts);
-
-		if (attempts > 1 && !isCorrectAnswer) {
-			setShowAnswer(true);
-		}
-
-		setTimeout(() => {
-			setShowMessage(false);
-
-			if (attempts > 1 || isCorrectAnswer) {
-				setNewProblem((prev) => {
-					setAttempts(0);
-					setShowAnswer(false);
-					setIsCorrectAnswer(false);
-					setScore((prev) => ({
-						count: prev.count + 1,
-						points: isCorrectAnswer ? prev.points + 10 / attempts : prev.points,
-					}));
-					return !prev;
-				});
+		if (!usersList.length) {
+			setView("Profiles");
+		} else if (view !== "Profiles") {
+			if (!user) {
+				if (usersList.length === 1) {
+					setUser(() => usersList[0]);
+				} else {
+					setView("Users");
+				}
+			} else if (!settings.operations.length || !settings.baseNums.length) {
+				setView("Settings");
 			}
-		}, 1000);
-	}, [attempts, isCorrectAnswer]);
-
-	const start = () => {
-		setScore({ count: 0, points: 0 });
-		setNewProblem((prev) => !prev);
-		setStarted(true);
-		setStats({});
-	};
-
-	const stop = () => {
-		setAttempts(0);
-		setIsCorrectAnswer(false);
-		setStarted(false);
-	};
+		}
+	}, [settings, view, usersList, user]);
 
 	const changeView = (view: string) => () => setView(view);
 
-	const timer = React.useMemo(() => {
-		return settings.timer === "speedTest" && started ? (
-			<Countdown
-				date={Date.now() + settings.maxTime * 60000}
-				onComplete={stop}
-			/>
-		) : null;
-	}, [settings.timer, settings.maxTime, started]);
+	const changeUser = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setGameData(() => {
+			setUser(e.target.value);
+			return defaultGameData;
+		});
+	};
 
-	let problemRef = React.useRef(newProblem);
-	const handleAnswer = React.useCallback(
-		(mode: string, problem: string, baseNum: number, isCorrect: boolean) => {
-			if (newProblem !== problemRef.current) {
-				setStats((prev) =>
-					updateStats(prev, mode, problem, baseNum, isCorrect)
-				);
-				problemRef.current = newProblem;
-			}
+	const selectUser = (user: string) =>
+		setView(() => {
+			setUser(user);
+			return "Game";
+		});
 
-			setIsCorrectAnswer(isCorrect);
-			setAttempts((prev) => prev + 1);
-		},
-		[newProblem]
-	);
+	const updateProfiles = (profiles: Profiles) => {
+		setProfiles(profiles);
+		setUser(Object.keys(profiles).pop() as string);
+	};
 
 	return (
-		<div className="h-screen w-screen">
-			<div className="flex h-full flex-col items-center justify-center text-center">
-				<div className="relative rounded-t-lg bg-zinc-600 shadow-lg shadow-cyan-600">
+		<div className="flex h-screen w-screen items-center">
+			<div className="m-auto flex w-full flex-col md:max-w-lg">
+				<div className="relative mt-16 flex flex-col rounded-lg bg-zinc-600 shadow-lg shadow-cyan-600">
+					{user && usersList.length > 1 && (
+						<div className="absolute -top-8 right-4">
+							<select value={user} onChange={changeUser}>
+								{usersList.map((user) => (
+									<option key={user} value={user}>
+										{user}
+									</option>
+								))}
+							</select>
+						</div>
+					)}
 					<div className="absolute -top-24 z-10 mx-auto flex w-48 justify-center rounded-full bg-zinc-600 p-4 text-white">
 						<img
 							src={logo}
 							className={
 								"h-40 w-40 rounded-full bg-yellow-200" +
-								(started && " animate-spin")
+								(gameData.status === GAME_STATUS.STARTED && " animate-spin")
 							}
 							alt="logo"
 						/>
 					</div>
-					<div className="flex h-12 content-center items-center justify-end px-3 text-right text-sm font-bold text-white">
-						{started && (
-							<div className="flex gap-3">
-								{timer}
-								<span>
-									Your Score: {score.points} (
-									{score.points
-										? ((score.points / (score.count * 10)) * 100).toFixed(1)
-										: 0}
-									%)
-								</span>
-							</div>
+					{/* Score */}
+					<div className="mt-2 flex h-8 content-center items-center justify-end px-3 text-right text-sm font-bold text-white">
+						{gameData.status !== GAME_STATUS.NOT_STARTED && (
+							<>
+								<div className="flex gap-3">
+									{/* {timer} */}
+									<span>
+										Your Score: {gameData.score} (
+										{gameData.score
+											? (
+													(gameData.score / ((gameData.count - 1) * 10)) *
+													100
+											  ).toFixed(1)
+											: 0}
+										%)
+									</span>
+								</div>
+								<Feedback
+									key={
+										gameData.status === GAME_STATUS.STARTED
+											? Math.random()
+											: undefined
+									}
+									isCorrect={gameData.isCorrect}
+								/>
+							</>
 						)}
 					</div>
-					<div className="relative m-3 mt-0 h-60 w-[500px] rounded-t-lg bg-white py-10 px-4">
-						{view === "Game" ? (
-							<>
-								{showMessage && (
-									<div className="absolute top-3 right-3 text-sm font-bold text-white">
-										{isCorrectAnswer ? (
-											<p className="rounded-sm bg-green-500/70 px-2 py-1">
-												{RandomItem(successOptions)}
-											</p>
-										) : (
-											<p className="rounded-sm bg-red-500 px-2 py-1">
-												{RandomItem(incorrectOptions)}
-											</p>
-										)}
-									</div>
-								)}
-								<div className="flex flex-col gap-6">
-									<div className="flex-1">
-										{started ? (
-											<Problem
-												settings={settings}
-												onAnswer={handleAnswer}
-												showAnswer={showAnswer}
-												newProblem={newProblem}
-											/>
-										) : Object.keys(stats).length === 0 ? (
-											<p>Welcome to the math game!</p>
-										) : (
-											<div className="mx-auto h-32 overflow-y-auto pr-2">
-												<GameStats data={stats} />
-											</div>
-										)}
-									</div>
-									<div className="flex justify-end text-2xl">
-										{started ? (
-											<button
-												type="button"
-												className="flex items-center gap-1 hover:opacity-90"
-												onClick={stop}
-											>
-												<FaStop />
-												Stop
-											</button>
-										) : (
-											<button
-												type="button"
-												className="flex items-center gap-1 text-green-600 hover:opacity-90"
-												onClick={start}
-											>
-												<FaPlay />
-												Start
-											</button>
-										)}
-									</div>
-								</div>
-							</>
+					<div className="relative1 m-2 rounded bg-white p-4 pt-16">
+						{view === "Users" ? (
+							<UsersView
+								users={usersList}
+								selectUser={selectUser}
+								changeView={changeView}
+							/>
+						) : view === "Stats" ? (
+							<StatsView user={user} profiles={profiles} changeUser={setUser} />
+						) : view === "Profiles" ? (
+							<ProfilesView
+								profiles={profiles}
+								updateProfiles={updateProfiles}
+							/>
+						) : view === "Settings" ? (
+							<SettingsView
+								user={user}
+								profiles={profiles}
+								changeUser={setUser}
+								changeSettings={setProfiles}
+							/>
 						) : (
-							<SettingsView settings={settings} onChange={setSettings} />
+							<Game
+								key={user}
+								user={user}
+								settings={settings}
+								gameData={gameData}
+								updateGameData={setGameData}
+							/>
 						)}
 					</div>
 				</div>
-				<div className="flex w-[500px] justify-end gap-0.5">
+				<div className="flex w-full justify-end gap-0.5 pr-3">
 					{viewOptions.map((option) => (
 						<button
 							key={option}

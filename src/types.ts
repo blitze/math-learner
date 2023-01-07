@@ -1,10 +1,29 @@
 export type Settings = {
-	modes: string[];
+	mode: string;
+	operations: string[];
 	baseNums: number[];
-	maxNum: number;
+	maxNum: {
+		Addition: number;
+		Division: number;
+		Multiplication: number;
+		Subtraction: number;
+	};
 	timer: string;
 	maxTime: number;
-	multipleChoice: boolean;
+	maxQuestions?: number;
+};
+
+export type GameData = {
+	count: number;
+	attempts: number;
+	score: number;
+	status: number;
+	isCorrect?: boolean;
+	elapsedTime: number;
+};
+
+export type Profiles = {
+	[name: string]: Settings;
 };
 
 export type Stats = {
