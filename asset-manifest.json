@@ -1,16 +1,17 @@
 {
   "files": {
-    "main.css": "/math-learner/static/css/main.7e6c8d76.css",
-    "main.js": "/math-learner/static/js/main.10dbc13b.js",
+    "main.css": "/math-learner/static/css/main.fb72b419.css",
+    "main.js": "/math-learner/static/js/main.79e8baf8.js",
     "static/js/787.cd363669.chunk.js": "/math-learner/static/js/787.cd363669.chunk.js",
+    "service-worker.js": "/math-learner/service-worker.js",
     "static/media/logo.svg": "/math-learner/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/math-learner/index.html",
-    "main.7e6c8d76.css.map": "/math-learner/static/css/main.7e6c8d76.css.map",
-    "main.10dbc13b.js.map": "/math-learner/static/js/main.10dbc13b.js.map",
+    "main.fb72b419.css.map": "/math-learner/static/css/main.fb72b419.css.map",
+    "main.79e8baf8.js.map": "/math-learner/static/js/main.79e8baf8.js.map",
     "787.cd363669.chunk.js.map": "/math-learner/static/js/787.cd363669.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.7e6c8d76.css",
-    "static/js/main.10dbc13b.js"
+    "static/css/main.fb72b419.css",
+    "static/js/main.79e8baf8.js"
   ]
 }
