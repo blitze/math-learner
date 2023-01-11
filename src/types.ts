@@ -1,5 +1,11 @@
-export type Settings = {
+export type StoredSettings = {
 	mode: string;
+	timer: number;
+	maxTime: number;
+	maxQuestions?: number;
+};
+
+export type Settings = StoredSettings & {
 	operations: string[];
 	baseNums: number[];
 	maxNum: {
@@ -8,26 +14,11 @@ export type Settings = {
 		Multiplication: number;
 		Subtraction: number;
 	};
-	timer: string;
-	maxTime: number;
-	maxQuestions?: number;
-};
-
-export type GameData = {
-	count: number;
-	attempts: number;
-	score: number;
-	status: number;
-	isCorrect?: boolean;
-	elapsedTime: number;
-};
-
-export type Profiles = {
-	[name: string]: Settings;
+	negatives: boolean;
 };
 
 export type Stats = {
-	[mode: string]: {
+	[operation: string]: {
 		[baseNum: number]: {
 			[problem: string]: {
 				correct: number;
@@ -35,4 +26,35 @@ export type Stats = {
 			};
 		};
 	};
+};
+
+export type StoredGameData = {
+	count: number;
+	attempted: number;
+	score: number;
+	mostInARow: number;
+	elapsedTime: number;
+	bonus: number;
+	stats: Stats;
+};
+
+export type GameData = StoredGameData & {
+	inARow: number;
+	attempts: number;
+	status: number;
+	msgCode?: number;
+};
+
+export type Profiles = {
+	[name: string]: Settings;
+};
+
+export type StoredGameStats = StoredGameData &
+	StoredSettings & {
+		stats: Stats;
+		timestamp?: number;
+	};
+
+export type StoredUserStats = {
+	[date: string]: StoredGameStats[];
 };

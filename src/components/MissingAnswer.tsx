@@ -1,3 +1,6 @@
+import { useMemo } from "react";
+import { RandomItem } from "../utils";
+
 interface FormElements extends HTMLFormControlsCollection {
 	answer: HTMLInputElement;
 }
@@ -14,6 +17,8 @@ type Props = {
 	checkAnswer: (input: number) => void;
 };
 
+const letters = ["𝒷", "𝒳", "p", "q", "r", "𝒴"];
+
 export default function MissingAnswer({
 	value,
 	missingIndex,
@@ -21,32 +26,40 @@ export default function MissingAnswer({
 	opSymbol,
 	checkAnswer,
 }: Props) {
-	const symbols = [opSymbol, "="];
+	const symbols = [opSymbol, <span>=</span>];
+	const l = useMemo(() => RandomItem(letters), []);
 
 	const handleSubmit = (e: React.FormEvent<InputAnswerFormElement>) => {
 		e.preventDefault();
-		checkAnswer(+e.currentTarget.elements.answer.value.trim());
-		e.currentTarget.elements.answer.value = "";
+		const input = +e.currentTarget.elements.answer.value.trim();
+		if (input) {
+			checkAnswer(input);
+			e.currentTarget.elements.answer.value = "";
+		}
 	};
 
 	return (
 		<form className="flex flex-col gap-6 text-2xl" onSubmit={handleSubmit}>
-			<p className="text-sm italic text-gray-400">What is X?</p>
+			<p className="text-sm italic text-gray-400">What is {l}?</p>
 			<div className="flex w-auto gap-4">
 				{eqParts.map((p, i) => (
 					<div key={i} className="flex items-center gap-4">
-						{i === missingIndex ? (
-							<input
-								id="answer"
-								type="text"
-								placeholder={value ? value.toString() : "X"}
-								disabled={!!value}
-								className="font-bolder h-12 w-14 rounded border text-center"
-							/>
-						) : (
-							<span>{p}</span>
-						)}
-						{symbols[i]}
+						<>
+							{i === missingIndex ? (
+								<input
+									id="answer"
+									type="text"
+									placeholder={value ? value.toString() : l}
+									disabled={!!value}
+									autoComplete="off"
+									autoFocus
+									className="font-bolder h-12 w-14 rounded border text-center"
+								/>
+							) : (
+								<span>{p}</span>
+							)}
+							<span>{symbols[i]}</span>
+						</>
 					</div>
 				))}
 			</div>

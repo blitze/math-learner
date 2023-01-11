@@ -2,25 +2,25 @@ import { useMemo } from "react";
 import type { Settings } from "../types";
 import {
 	answerModes,
-	NumericSort,
 	randomAnswerGenerator,
 	RandomItem,
 	RandomNumber,
-	Shuffle,
 } from "../utils";
 
-export default function Addition(settings: Settings) {
+export default function Division(settings: Settings) {
 	return useMemo(() => {
-		const [num1, num2] = Shuffle<number>([
-			RandomItem<number>(settings.baseNums),
-			RandomNumber(0, settings.maxNum.Addition),
-		]);
-		const answer = num1 + num2;
+		const missingIndex = RandomNumber(0, 2);
+		const num2 = RandomItem<number>(settings.baseNums);
+		const maxNum = RandomNumber(
+			missingIndex !== 1 ? num2 - 1 : num2,
+			settings.maxNum.Division
+		);
+		const answer = Math.floor(maxNum / num2);
+		const num1 = num2 * answer;
 		const multiOptions =
 			settings.mode === answerModes.MULTICHOICE
 				? randomAnswerGenerator(answer)
 				: [];
-		const missingIndex = RandomNumber(0, 2);
 
 		return {
 			num1,
@@ -28,9 +28,9 @@ export default function Addition(settings: Settings) {
 			answer,
 			multiOptions,
 			missingIndex,
-			baseNum: NumericSort([num1, num2])[0],
-			opSymbol: "+",
-			op: "Addition",
+			baseNum: num2,
+			opSymbol: "÷",
+			op: "Division",
 		};
 	}, [settings]);
 }

@@ -1,7 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import type { GameData, Settings } from "../types";
 import * as Operations from "../operations";
-import { defaultGameData, GAME_STATUS } from "../utils";
+import {
+	answerModes,
+	GAME_STATUS,
+	POINTS_PER_QUESTION,
+	RandomItem,
+	TIMERS,
+	updateStats,
+} from "../utils";
+import RemainingTime from "./RemainingTime";
+import InputAnswer from "./InputAnswer";
+import MissingAnswer from "./MissingAnswer";
+import MultiChoiceAnswer from "./MultiChoiceAnswer";
 
 type Props = {
 	settings: Settings;
@@ -10,61 +21,169 @@ type Props = {
 };
 
 function Questions({ settings, gameData, updateGameData }: Props) {
-	const ops = "Addition"; // RandomItem(settings.operations) as string;
-	const Component = Operations[ops];
+	const [answerKey, setAnswerKey] = useState<number>();
 
-	const onComplete = (
-		inputIsCorrect: boolean,
-		feedbackOnly: boolean = false
+	const operation = RandomItem(settings.operations) as string;
+	const {
+		num1,
+		num2,
+		answer,
+		baseNum,
+		multiOptions,
+		missingIndex,
+		op,
+		opSymbol,
+	} = Operations[operation as keyof typeof Operations](settings);
+
+	const nextQuestion = (
+		isCorrect: boolean,
+		userAttempted: boolean,
+		feedbackOnly: boolean = false,
+		timeOutCode: number | undefined = undefined
 	) => {
 		updateGameData((prev) => {
 			if (feedbackOnly) {
-				return { ...prev, isCorrect: inputIsCorrect };
+				return { ...prev, msgCode: 1 };
 			}
 
-			let { count, attempts, score } = prev;
+			let points = 0;
+			let {
+				count,
+				attempted,
+				attempts,
+				score,
+				msgCode,
+				inARow,
+				mostInARow,
+				bonus,
+				stats,
+				status,
+			} = prev;
 
 			attempts++;
 
-			if (inputIsCorrect || attempts > 1) {
-				score += inputIsCorrect ? 10 / attempts : 0;
+			if (isCorrect || attempts > 1) {
+				if (isCorrect) {
+					points = POINTS_PER_QUESTION / attempts;
 
-				// isCorrect = undefined;
+					if (attempts === 1) {
+						inARow++;
+
+						if (inARow > mostInARow) {
+							mostInARow = inARow;
+						}
+
+						// exponentially add bonus points for every 5 in a row
+						if (inARow % 5 === 0) {
+							bonus += Math.floor(inARow / 5) * 50;
+						}
+					} else {
+						inARow = 0;
+					}
+				} else {
+					inARow = 0;
+				}
+
 				attempts = 0;
+				attempted += +userAttempted;
 				count++;
 			}
 
-			if (settings.maxQuestions && count > settings.maxQuestions) {
-				return { ...defaultGameData, status: GAME_STATUS.ENDED };
-			}
+			setAnswerKey(undefined);
+
+			const problem = `${num1} ${opSymbol} ${num2} = ${answer}`;
+			stats = updateStats(stats, op, problem, baseNum, isCorrect);
+			score += points;
+			msgCode = timeOutCode || points + attempts;
 
 			return {
 				...prev,
-				count,
 				attempts,
+				count,
+				attempted,
 				score,
-				isCorrect: inputIsCorrect,
+				inARow,
+				mostInARow,
+				bonus,
+				msgCode,
+				stats,
+				status:
+					settings.maxQuestions && count === settings.maxQuestions
+						? GAME_STATUS.ENDED
+						: status,
 			};
 		});
 	};
 
+	const onTimeRunOut = () => nextQuestion(false, false, false, -1);
+
+	const checkAnswer = (answer: number) => (input: number) => {
+		const isCorrect = input === answer;
+		const attempts = gameData.attempts + 1;
+
+		if (isCorrect || attempts < 2) {
+			nextQuestion(isCorrect, !!input);
+		} else {
+			nextQuestion(isCorrect, !!input, true);
+			setTimeout(() => setAnswerKey(answer), 1000);
+			setTimeout(() => nextQuestion(isCorrect, !!input), 3000);
+		}
+	};
+
+	const eqParts = [num1, num2, answer];
+	const missingNum = eqParts[missingIndex];
+
 	return (
-		Component && (
-			<div className="mx-auto flex w-auto flex-col gap-2">
-				<h1 className="text-sm font-bold text-cyan-500">
-					{`Question ${gameData.count}${
-						settings.maxQuestions ? " of " + settings.maxQuestions : ""
-					}`}
-				</h1>
-				<div className="rounded-md border py-6 px-8 shadow-md">
-					<Component
-						settings={settings}
+		<div className="mx-auto flex w-auto flex-col gap-2">
+			<h1 className="flex justify-between text-sm font-bold text-cyan-500">
+				{`Question ${gameData.count + 1}${
+					settings.maxQuestions ? " of " + settings.maxQuestions : ""
+				}`}
+				{settings.timer === TIMERS.FLASH_DRILL && (
+					<RemainingTime
+						key={gameData.count}
+						duration={settings.maxTime * 1000}
 						gameData={gameData}
-						onComplete={onComplete}
+						onFinish={onTimeRunOut}
 					/>
+				)}
+			</h1>
+			<div className="rounded-md border py-6 px-8 shadow-md">
+				<div className="relative">
+					{gameData.status === GAME_STATUS.PAUSED && (
+						<div className="absolute top-0 bottom-0 left-0 right-0"></div>
+					)}
+					{settings.mode !== answerModes.MISSING ? (
+						<div className="flex w-auto items-center gap-4 text-2xl">
+							<span>{num1}</span>
+							{opSymbol}
+							<span>{num2}</span>
+							<span>=</span>
+							{settings.mode === answerModes.USERINPUT ? (
+								<InputAnswer
+									value={answerKey}
+									checkAnswer={checkAnswer(answer)}
+								/>
+							) : (
+								<MultiChoiceAnswer
+									value={answerKey}
+									options={multiOptions}
+									checkAnswer={checkAnswer(answer)}
+								/>
+							)}
+						</div>
+					) : (
+						<MissingAnswer
+							missingIndex={missingIndex}
+							eqParts={eqParts}
+							opSymbol={opSymbol}
+							value={answerKey}
+							checkAnswer={checkAnswer(missingNum)}
+						/>
+					)}
 				</div>
 			</div>
-		)
+		</div>
 	);
 }
 

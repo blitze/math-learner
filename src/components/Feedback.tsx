@@ -1,26 +1,29 @@
 import { useState } from "react";
 import { useTimeout } from "usehooks-ts";
-import { failureOptions, RandomItem, successOptions } from "../utils";
+import { feedbackMsgs, RandomItem } from "../utils";
 
 type Props = {
-	isCorrect?: boolean;
+	msgCode?: number;
 };
 
-export default function Feedback({ isCorrect }: Props) {
-	const [message, setMessage] = useState<string>(() => {
-		const msg =
-			isCorrect !== undefined
-				? RandomItem<string>(isCorrect ? successOptions : failureOptions)
-				: "";
-		console.log(isCorrect, msg);
-		return msg;
-	});
+export default function Feedback({ msgCode }: Props) {
+	const [message, setMessage] = useState<string>(() =>
+		msgCode !== undefined
+			? RandomItem<string>(feedbackMsgs[msgCode as keyof typeof feedbackMsgs])
+			: ""
+	);
 
 	const hide = () => setMessage("");
 
 	useTimeout(hide, message ? 3000 : null);
 
-	return message ? (
-		<div className="absolute right-3 top-16 bg-blue-400 px-3">{message}</div>
+	return msgCode && message ? (
+		<div
+			className={`absolute top-20 right-5 ${
+				msgCode > 4 ? "bg-green-500" : "bg-red-500"
+			} rounded px-4 py-2 shadow-sm`}
+		>
+			{message}
+		</div>
 	) : null;
 }

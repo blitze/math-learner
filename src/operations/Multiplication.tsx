@@ -9,18 +9,18 @@ import {
 	Shuffle,
 } from "../utils";
 
-export default function Addition(settings: Settings) {
+export default function Multiplication(settings: Settings) {
 	return useMemo(() => {
-		const [num1, num2] = Shuffle<number>([
+		const missingIndex = RandomNumber(0, 2);
+		const [num1, num2] = Shuffle([
 			RandomItem<number>(settings.baseNums),
-			RandomNumber(0, settings.maxNum.Addition),
+			RandomNumber(missingIndex > 1 ? 0 : 1, settings.maxNum.Multiplication),
 		]);
-		const answer = num1 + num2;
+		const answer = num1 * num2;
 		const multiOptions =
 			settings.mode === answerModes.MULTICHOICE
 				? randomAnswerGenerator(answer)
 				: [];
-		const missingIndex = RandomNumber(0, 2);
 
 		return {
 			num1,
@@ -29,8 +29,8 @@ export default function Addition(settings: Settings) {
 			multiOptions,
 			missingIndex,
 			baseNum: NumericSort([num1, num2])[0],
-			opSymbol: "+",
-			op: "Addition",
+			opSymbol: "×",
+			op: "Multiplication",
 		};
 	}, [settings]);
 }

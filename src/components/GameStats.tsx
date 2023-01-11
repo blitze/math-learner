@@ -1,48 +1,75 @@
-import React from "react";
-import { Stats } from "../types";
+import { useEffect } from "react";
+import { useLocalStorage } from "usehooks-ts";
+import type {
+	GameData,
+	Settings,
+	StoredGameStats,
+	StoredUserStats,
+} from "../types";
+import SessionStats from "./SessionStats";
 
 type Props = {
-	data: Stats;
+	user: string;
+	gameData: GameData;
+	settings: Settings;
 };
 
-function GameStats({ data }: Props) {
+function GameStats({ user, gameData, settings }: Props) {
+	const [storedUserStats, setStoredUserStats] =
+		useLocalStorage<StoredUserStats>(user, {});
+	const { mode, maxQuestions, timer, maxTime } = settings;
+	const { count, attempted, score, mostInARow, elapsedTime, bonus, stats } =
+		gameData;
+
+	useEffect(() => {
+		const day = new Date().toLocaleDateString();
+		const statData: StoredGameStats = {
+			mode,
+			timer,
+			maxTime,
+			count,
+			attempted,
+			score,
+			mostInARow,
+			elapsedTime,
+			bonus,
+			stats,
+			timestamp: +new Date(),
+		};
+
+		setStoredUserStats((prev) => ({
+			...prev,
+			[day]: [...(prev[day] || []), statData],
+		}));
+	}, [
+		mode,
+		timer,
+		maxTime,
+		count,
+		attempted,
+		score,
+		mostInARow,
+		elapsedTime,
+		bonus,
+		stats,
+	]);
+
 	return (
-		<>
-			<h2 className="mb-4 font-bold">Game Stats</h2>
-			<div className="grid grid-cols-2 gap-3">
-				{Object.keys(data)
-					.sort()
-					.map((operator) =>
-						Object.entries(data[operator]).map(([baseNum, problems]) => (
-							<div
-								key={baseNum}
-								className="flex flex-col gap-2 rounded-lg bg-slate-100 p-4"
-							>
-								<h5 className="font-bold">{`${operator} by ${baseNum}`}</h5>
-								<ol className="text-xs">
-									{Object.entries(problems).map(([problem, stats]) => (
-										<li
-											key={problem}
-											className="flex flex-auto items-center justify-start justify-items-start gap-2"
-										>
-											<span>{problem}</span>
-											<span className="flex-grow border-b border-dashed border-gray-500"></span>
-											<span>
-												({stats.correct}/{stats.correct + stats.incorrect}){" "}
-												{(
-													(stats.correct / (stats.correct + stats.incorrect)) *
-													100
-												).toFixed(1)}
-												%
-											</span>
-										</li>
-									))}
-								</ol>
-							</div>
-						))
-					)}
-			</div>
-		</>
+		<div className="flex flex-col gap-4">
+			<h1 className="text-center text-lg font-bold">Game Stats</h1>
+			<SessionStats
+				count={count}
+				attempted={attempted}
+				score={score}
+				mostInARow={mostInARow}
+				elapsedTime={elapsedTime}
+				bonus={bonus}
+				stats={stats}
+				mode={mode}
+				timer={timer}
+				maxTime={maxTime}
+			/>
+		</div>
 	);
 }
 

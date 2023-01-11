@@ -14,18 +14,23 @@ type Props = {
 export default function InputAnswer({ value, checkAnswer }: Props) {
 	const handleSubmit = (e: React.FormEvent<InputAnswerFormElement>) => {
 		e.preventDefault();
-		checkAnswer(+e.currentTarget.elements.answer.value.trim());
-		e.currentTarget.elements.answer.value = "";
+		const input = +e.currentTarget.elements.answer.value.trim();
+		if (input) {
+			checkAnswer(input);
+			e.currentTarget.elements.answer.value = "";
+		}
 	};
 
 	return value ? (
-		<>value</>
+		<span>{value}</span>
 	) : (
 		<form className="flex h-10 items-center" onSubmit={handleSubmit}>
 			<input
 				type="text"
 				id="answer"
 				className="h-full w-16 rounded-l border px-2"
+				autoComplete="off"
+				autoFocus
 			/>
 			<button
 				type="submit"

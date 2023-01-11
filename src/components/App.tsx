@@ -1,28 +1,24 @@
-import React from "react";
+import React, { useCallback } from "react";
 import logo from "./logo.svg";
 
 import {
 	defaultGameData,
 	GAME_STATUS,
-	// incorrectOptions,
-	// RandomItem,
-	// successOptions,
-	// updateStats,
+	getPercentScore,
 	viewOptions,
 } from "../utils";
-// import { FaPlay, FaStop } from "react-icons/fa";
 import type { GameData, Profiles } from "../types";
 import SettingsView from "./Settings";
 import ProfilesView from "./Profiles";
 // import GameStats from "./GameStats";
-// import Countdown from "react-countdown";
 import UsersView from "./UsersView";
 import Game from "./Game";
 import { useLocalStorage } from "usehooks-ts";
 import StatsView from "./StatsView";
 import Feedback from "./Feedback";
+import ElapsedTime from "./ElapsedTime";
 
-function App(): JSX.Element {
+function App() {
 	const [user, setUser] = React.useState("");
 	const [profiles, setProfiles] = useLocalStorage<Profiles>("profiles", {});
 	const [view, setView] = React.useState("Game");
@@ -47,7 +43,11 @@ function App(): JSX.Element {
 		}
 	}, [settings, view, usersList, user]);
 
-	const changeView = (view: string) => () => setView(view);
+	const changeView = (view: string) => () =>
+		setView(() => {
+			setGameData(defaultGameData);
+			return view;
+		});
 
 	const changeUser = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setGameData(() => {
@@ -56,16 +56,21 @@ function App(): JSX.Element {
 		});
 	};
 
-	const selectUser = (user: string) =>
+	const selectUser = (user: string, view: string = "Game") =>
 		setView(() => {
 			setUser(user);
-			return "Game";
+			return view;
 		});
 
 	const updateProfiles = (profiles: Profiles) => {
 		setProfiles(profiles);
 		setUser(Object.keys(profiles).pop() as string);
 	};
+
+	const setElapsedTime = useCallback(
+		(time: number) => setGameData((prev) => ({ ...prev, elapsedTime: time })),
+		[]
+	);
 
 	return (
 		<div className="flex h-screen w-screen items-center">
@@ -83,40 +88,42 @@ function App(): JSX.Element {
 						</div>
 					)}
 					<div className="absolute -top-24 z-10 mx-auto flex w-48 justify-center rounded-full bg-zinc-600 p-4 text-white">
-						<img
-							src={logo}
-							className={
-								"h-40 w-40 rounded-full bg-yellow-200" +
-								(gameData.status === GAME_STATUS.STARTED && " animate-spin")
-							}
-							alt="logo"
-						/>
+						<button onClick={changeView("Game")}>
+							<img
+								src={logo}
+								className={
+									"h-40 w-40 rounded-full bg-yellow-200" +
+									(gameData.status === GAME_STATUS.STARTED && " animate-spin")
+								}
+								alt="logo"
+							/>
+						</button>
 					</div>
 					{/* Score */}
-					<div className="mt-2 flex h-8 content-center items-center justify-end px-3 text-right text-sm font-bold text-white">
-						{gameData.status !== GAME_STATUS.NOT_STARTED && (
+					<div className="mt-2 flex h-8 items-center justify-end px-3 text-center text-xs font-bold text-white">
+						{view === "Game" && gameData.status !== GAME_STATUS.NOT_STARTED && (
 							<>
-								<div className="flex gap-3">
-									{/* {timer} */}
-									<span>
-										Your Score: {gameData.score} (
-										{gameData.score
-											? (
-													(gameData.score / ((gameData.count - 1) * 10)) *
-													100
-											  ).toFixed(1)
-											: 0}
-										%)
-									</span>
+								<div className="flex w-1/2 justify-between">
+									<div className="flex flex-col">
+										<span>Elapsed Time</span>
+										<span>
+											<ElapsedTime
+												gameData={gameData}
+												onStop={setElapsedTime}
+											/>
+										</span>
+									</div>
+									<div className="flex flex-col">
+										<span>Your Score</span>
+										<span>
+											{gameData.score + gameData.bonus} (
+											{getPercentScore(gameData.score, gameData.count)}%)
+										</span>
+									</div>
 								</div>
-								<Feedback
-									key={
-										gameData.status === GAME_STATUS.STARTED
-											? Math.random()
-											: undefined
-									}
-									isCorrect={gameData.isCorrect}
-								/>
+								{gameData.status === GAME_STATUS.STARTED && view === "Game" && (
+									<Feedback key={Math.random()} msgCode={gameData.msgCode} />
+								)}
 							</>
 						)}
 					</div>
@@ -133,6 +140,7 @@ function App(): JSX.Element {
 							<ProfilesView
 								profiles={profiles}
 								updateProfiles={updateProfiles}
+								navToUserView={selectUser}
 							/>
 						) : view === "Settings" ? (
 							<SettingsView
@@ -141,14 +149,15 @@ function App(): JSX.Element {
 								changeUser={setUser}
 								changeSettings={setProfiles}
 							/>
-						) : (
+						) : settings && view === "Game" ? (
 							<Game
-								key={user}
 								user={user}
 								settings={settings}
 								gameData={gameData}
 								updateGameData={setGameData}
 							/>
+						) : (
+							<p>Loading...</p>
 						)}
 					</div>
 				</div>

@@ -1,5 +1,7 @@
 import type { Stats } from "./types";
 
+export const POINTS_PER_QUESTION = 10;
+
 export const operationOptions: string[] = [
 	"Addition",
 	"Subtraction",
@@ -7,17 +9,22 @@ export const operationOptions: string[] = [
 	"Division",
 ];
 
-export const successOptions: string[] = [
-	"Correct!",
-	"Well done!",
-	"Nice work!",
-	"Excellent!",
-	"Sweet!",
-	"Whoohoo!",
-	"Super!",
-];
+export const feedbackMsgs = {
+	// ran out of time
+	"-1": ["Focus", "Quick", "Out of time!"],
 
-export const failureOptions: string[] = ["Incorrect!", "Not quite!", "Nope!"];
+	// wrong on first try
+	0: ["Not quite! Try again", "Try again!"],
+
+	// wrong on second try
+	1: ["Incorrect!", "Not quite!", "Nope!"],
+
+	// correct on second try
+	5: ["Correct!", "Sweet!", "Nice!"],
+
+	// correct at first try
+	10: ["Well done!", "Nice work!", "Excellent!", "Whoohoo!", "Super!"],
+};
 
 export const viewOptions: string[] = ["Game", "Stats", "Profiles", "Settings"];
 
@@ -27,6 +34,18 @@ export const answerModes = {
 	MULTICHOICE: "Multiple Choice",
 	USERINPUT: "User Input",
 	MISSING: "Missing Number",
+};
+
+export const TIMERS = {
+	NONE: 0,
+	SPEED_DRILL: 1,
+	FLASH_DRILL: 2,
+};
+
+export const TRANS_TIMERS = {
+	[TIMERS.NONE]: "None",
+	[TIMERS.SPEED_DRILL]: "Speed Drill",
+	[TIMERS.FLASH_DRILL]: "Flash Drill",
 };
 
 export const GAME_STATUS = {
@@ -46,19 +65,25 @@ export const defaultSettings = {
 		Multiplication: 12,
 		Subtraction: 10,
 	},
-	timer: "none",
+	timer: 0,
 	maxTime: 1,
 	maxQuestions: 0,
 	multipleChoice: true,
+	negatives: false,
 };
 
 export const defaultGameData = {
-	count: 1,
+	count: 0,
+	attempted: 0,
 	attempts: 0,
 	score: 0,
+	inARow: 0,
+	mostInARow: 0,
+	bonus: 0,
 	status: GAME_STATUS.NOT_STARTED,
-	isCorrect: undefined,
+	msgCode: undefined,
 	elapsedTime: 0,
+	stats: {},
 };
 
 // Returns random number between min and max
@@ -67,14 +92,19 @@ export function RandomNumber(min: number, max: number): number {
 }
 
 // Select random item from a list
-export function RandomItem<T>(items: (string | number)[]): T {
-	return items[Math.floor(Math.random() * items.length)] as T;
+export function RandomItem<T>(items: T[]) {
+	return items[Math.floor(Math.random() * items.length)];
 }
 
 // Randomly rearrange items in a list
-export function Shuffle(items: (string | number)[]) {
-	items.sort(() => Math.random() - 0.5);
-	return items;
+export function Shuffle<T>(items: T[]) {
+	return items.sort(() => Math.random() - 0.5);
+}
+
+// Sort numbers
+export function NumericSort(items: number[], desc: boolean = false) {
+	const sortedItems = items.sort((a, b) => a - b);
+	return !desc ? sortedItems : sortedItems.reverse();
 }
 
 export function updateStats(
@@ -116,6 +146,19 @@ export function updateStats(
 			},
 		},
 	};
+}
+
+export function getPercentScore(
+	score: number,
+	count: number,
+	maxQuestions: number = 0
+) {
+	if (!score) return 0;
+
+	const possiblePoints =
+		POINTS_PER_QUESTION * (maxQuestions ? maxQuestions : count);
+
+	return ((score / possiblePoints) * 100).toFixed(1);
 }
 
 export function randomAnswerGenerator(answer: number) {
