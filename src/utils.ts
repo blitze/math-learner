@@ -114,20 +114,6 @@ export function updateStats(
 	baseNum: number,
 	isCorrect: boolean
 ) {
-	// let stats = JSON.parse(localStorage.getItem("stats") || "{}");
-	// if (stats[problem] === undefined) {
-	// 	stats[problem] = {
-	// 		correct: 0,
-	// 		incorrect: 0,
-	// 	};
-	// }
-	// if (isCorrect) {
-	// 	stats[problem].correct++;
-	// } else {
-	// 	stats[problem].incorrect++;
-	// }
-	// localStorage.setItem("stats", JSON.stringify(stats));
-
 	const modeKey = stats[mode] || {};
 	const baseNumKey = modeKey[baseNum] || {};
 	const probKey = baseNumKey[problem] || { correct: 0, incorrect: 0 };
