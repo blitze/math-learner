@@ -34,6 +34,8 @@ export default function UserProfiles({
 	const deleteProfile = (name: string) => () => {
 		if (profiles) {
 			const { [name]: remove, ...rest } = profiles;
+
+			window.localStorage.removeItem(name);
 			updateProfiles(rest);
 		}
 	};
