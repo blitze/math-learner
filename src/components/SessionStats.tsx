@@ -33,83 +33,89 @@ export default function SessionStats({ ...props }: StoredGameStats) {
 						</span>
 					)}
 				</h1>
-				<div className="my-2 flex items-start gap-4">
-					<table className="table-auto">
-						<tr>
-							<td className="pr-2 text-right font-semibold">Total Score:</td>
-							<td>
-								{bonus + score} ({getPercentScore(score, count, maxQuestions)}
-								%)
-							</td>
-						</tr>
-						<tr>
-							<td className="pr-2 text-right font-semibold">
-								Attempted Questions:
-							</td>
-							<td>
-								{attempted} / {maxQuestions || count}
-							</td>
-						</tr>
-						<tr>
-							<td className="pr-2 text-right font-semibold">Most in a row:</td>
-							<td>{mostInARow}</td>
-						</tr>
-						<tr>
-							<td className="pr-2 text-right font-semibold">Bonus Points:</td>
-							<td>{bonus}</td>
-						</tr>
-						<tr>
-							<td className="pr-2 text-right font-semibold">Time Taken:</td>
-							<td>
-								<Timecode time={elapsedTime} />
-							</td>
-						</tr>
-						<tr>
-							<td className="pr-2 text-right font-semibold">
-								Ave. time per question:
-							</td>
-							<td>
-								<Timecode
-									time={count ? elapsedTime / count : (maxTime || 0) * 1000}
-								/>
-							</td>
-						</tr>
+				<div className="my-2 grid items-start gap-4 px-3 sm:grid-cols-2 md:gap-8">
+					<table className="table-auto md:table-fixed">
+						<tbody>
+							<tr>
+								<td className="pr-2 text-right font-semibold">Total Score:</td>
+								<td>
+									{bonus + score} ({getPercentScore(score, count, maxQuestions)}
+									%)
+								</td>
+							</tr>
+							<tr>
+								<td className="pr-2 text-right font-semibold">
+									Attempted Questions:
+								</td>
+								<td>
+									{attempted} / {maxQuestions || count}
+								</td>
+							</tr>
+							<tr>
+								<td className="pr-2 text-right font-semibold">
+									Most in a row:
+								</td>
+								<td>{mostInARow}</td>
+							</tr>
+							<tr>
+								<td className="pr-2 text-right font-semibold">Bonus Points:</td>
+								<td>{bonus}</td>
+							</tr>
+							<tr>
+								<td className="pr-2 text-right font-semibold">Time Taken:</td>
+								<td>
+									<Timecode time={elapsedTime} />
+								</td>
+							</tr>
+							<tr>
+								<td className="pr-2 text-right font-semibold">
+									Ave. time per question:
+								</td>
+								<td>
+									<Timecode
+										time={count ? elapsedTime / count : (maxTime || 0) * 1000}
+									/>
+								</td>
+							</tr>
+						</tbody>
 					</table>
-					<table className="table-auto">
-						<tr>
-							<td className="pr-2 text-right font-semibold">Mode:</td>
-							<td>{mode}</td>
-						</tr>
-						<tr>
-							<td className="pr-2 text-right font-semibold">Timer:</td>
-							<td>{TRANS_TIMERS[timer]}</td>
-						</tr>
-						{timer === TIMERS.SPEED_DRILL && (
+					<table className="table-auto md:table-fixed">
+						<tbody>
 							<tr>
-								<td className="pr-2 text-right font-semibold">Max. Time:</td>
-								<td>
-									<Timecode time={maxTime * 60000} />
-								</td>
+								<td className="pr-2 text-right font-semibold">Mode:</td>
+								<td>{mode}</td>
 							</tr>
-						)}
-						{timer === TIMERS.FLASH_DRILL && (
 							<tr>
-								<td className="pr-2 text-right font-semibold">
-									Time per question:
-								</td>
-								<td>
-									<Timecode time={maxTime * 1000} />
-								</td>
+								<td className="pr-2 text-right font-semibold">Timer:</td>
+								<td>{TRANS_TIMERS[timer]}</td>
 							</tr>
-						)}
-						{!!maxQuestions && (
-							<tr>
-								<td className="pr-2 text-right font-semibold">
-									Max. questions:
-								</td>
-								<td>{maxQuestions}</td>
-							</tr>
-						)}
+							{timer === TIMERS.SPEED_DRILL && (
+								<tr>
+									<td className="pr-2 text-right font-semibold">Max. Time:</td>
+									<td>
+										<Timecode time={maxTime * 60000} />
+									</td>
+								</tr>
+							)}
+							{timer === TIMERS.FLASH_DRILL && (
+								<tr>
+									<td className="pr-2 text-right font-semibold">
+										Time per question:
+									</td>
+									<td>
+										<Timecode time={maxTime * 1000} />
+									</td>
+								</tr>
+							)}
+							{!!maxQuestions && (
+								<tr>
+									<td className="pr-2 text-right font-semibold">
+										Max. questions:
+									</td>
+									<td>{maxQuestions}</td>
+								</tr>
+							)}
+						</tbody>
 					</table>
 				</div>
 				{!!Object.keys(stats).length && (

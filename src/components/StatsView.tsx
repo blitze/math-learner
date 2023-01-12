@@ -41,9 +41,8 @@ export default function StatsView({ user, profiles, changeUser }: Props) {
 						}`}
 					>
 						{entries.map((data, i) => (
-							<div className="py-2 shadow">
+							<div key={i} className="py-2 shadow">
 								<SessionStats
-									key={i}
 									count={data.count}
 									attempted={data.attempted}
 									score={data.score}

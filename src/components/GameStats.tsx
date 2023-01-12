@@ -15,9 +15,8 @@ type Props = {
 };
 
 function GameStats({ user, gameData, settings }: Props) {
-	const [storedUserStats, setStoredUserStats] =
-		useLocalStorage<StoredUserStats>(user, {});
-	const { mode, maxQuestions, timer, maxTime } = settings;
+	const [, setStoredUserStats] = useLocalStorage<StoredUserStats>(user, {});
+	const { mode, timer, maxTime } = settings;
 	const { count, attempted, score, mostInARow, elapsedTime, bonus, stats } =
 		gameData;
 
@@ -52,6 +51,7 @@ function GameStats({ user, gameData, settings }: Props) {
 		elapsedTime,
 		bonus,
 		stats,
+		setStoredUserStats,
 	]);
 
 	return (

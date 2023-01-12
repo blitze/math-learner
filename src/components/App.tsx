@@ -73,8 +73,8 @@ function App() {
 	);
 
 	return (
-		<div className="flex h-screen w-screen items-center">
-			<div className="m-auto flex w-full flex-col md:max-w-lg">
+		<div className="my-8 flex w-screen items-center md:my-20">
+			<div className="mx-auto flex w-full flex-col md:max-w-2xl">
 				<div className="relative mt-16 flex flex-col rounded-lg bg-zinc-600 shadow-lg shadow-cyan-600">
 					{user && usersList.length > 1 && (
 						<div className="absolute -top-8 right-4">
@@ -135,7 +135,12 @@ function App() {
 								changeView={changeView}
 							/>
 						) : view === "Stats" ? (
-							<StatsView user={user} profiles={profiles} changeUser={setUser} />
+							<StatsView
+								key={user}
+								user={user}
+								profiles={profiles}
+								changeUser={setUser}
+							/>
 						) : view === "Profiles" ? (
 							<ProfilesView
 								profiles={profiles}

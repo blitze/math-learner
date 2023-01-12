@@ -31,12 +31,14 @@ export default function Game({
 	return (
 		<div className="flex flex-col gap-6">
 			{gameData.status === GAME_STATUS.NOT_STARTED ? (
-				<div className="flex flex-col gap-2 py-4">
-					<p>
-						Hello <b>{user}</b>,
-					</p>
-					<p>Welcome to the Math Game!</p>
-					<p className="mt-4">Press start when you're ready!</p>
+				<div className="flex justify-center py-4">
+					<div className="flex w-auto flex-col gap-2">
+						<p>
+							Hello <b>{user}</b>,
+						</p>
+						<p>Welcome to the Math Game!</p>
+						<p className="mt-4">Press start when you're ready!</p>
+					</div>
 				</div>
 			) : gameData.status === GAME_STATUS.ENDED && gameData.elapsedTime ? (
 				<GameStats user={user} gameData={gameData} settings={settings} />

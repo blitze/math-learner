@@ -223,7 +223,7 @@ function SettingsView({
 							</div>
 						</div>
 					</div>
-					<div className="flex gap-4 text-left">
+					<div className="flex gap-4 border-t text-left">
 						<label className="w-1/3 text-right font-bold">Operation:</label>
 						<div className="flex flex-col gap-2">
 							<div className="pr-4 text-right font-bold">Max.</div>
@@ -261,7 +261,7 @@ function SettingsView({
 					</div>
 					<div className="flex gap-4 border-t pt-4 text-left">
 						<label className="w-1/3 text-right font-bold">Base number:</label>
-						<div className="grid grid-cols-4 gap-3">
+						<div className="grid grid-cols-5 gap-3">
 							{baseNumOptions.map((num: number) => (
 								<label key={num}>
 									<input
