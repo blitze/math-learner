@@ -15,7 +15,7 @@ export default function Feedback({ msgCode }: Props) {
 	);
 
 	useEffect(() => {
-		if (msgCode) {
+		if (msgCode && message) {
 			const audioTune = new Audio(
 				msgCode > 4 ? sounds.success1 : sounds.try_again
 			);
