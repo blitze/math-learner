@@ -39,7 +39,7 @@ function GameStats({ user, gameData, settings }: Props) {
 
 		setStoredUserStats((prev) => ({
 			...prev,
-			[day]: [...(prev[day] || []), statData],
+			[day]: [statData, ...(prev[day] || [])],
 		}));
 	}, [
 		mode,

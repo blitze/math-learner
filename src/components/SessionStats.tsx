@@ -17,7 +17,6 @@ export default function SessionStats({ ...props }: StoredGameStats) {
 		stats,
 		timer,
 		maxQuestions,
-		timestamp,
 	} = props;
 
 	const toggleDetails = () => setShowDetails((prev) => !prev);
@@ -25,14 +24,6 @@ export default function SessionStats({ ...props }: StoredGameStats) {
 	return (
 		<>
 			<div className="flex w-full flex-col gap-1 text-xs">
-				<h1 className="flex items-center justify-center">
-					Summary
-					{timestamp && (
-						<span className="ml-2 rounded bg-gray-200 p-1 text-black">
-							{new Date(timestamp).toLocaleTimeString().toLowerCase()}
-						</span>
-					)}
-				</h1>
 				<div className="my-2 grid items-start gap-4 px-3 sm:grid-cols-2 md:gap-8">
 					<table className="table-auto md:table-fixed">
 						<tbody>
