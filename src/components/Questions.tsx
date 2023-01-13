@@ -91,7 +91,14 @@ function Questions({ settings, gameData, updateGameData }: Props) {
 
 			setAnswerKey(undefined);
 
-			const problem = `${num1} ${opSymbol} ${num2} = ${answer}`;
+			let parts = [String(num1), String(num2), String(answer)];
+
+			if (settings.mode === answerModes.MISSING) {
+				parts.splice(missingIndex, 1, `[${parts[missingIndex]}]`);
+			}
+
+			const [p1, p2, p3] = parts;
+			const problem = `${p1} ${opSymbol} ${p2} = ${p3}`;
 			stats = updateStats(stats, op, problem, baseNum, isCorrect);
 			score += points;
 			msgCode = timeOutCode || points + attempts;
