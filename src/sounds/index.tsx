@@ -1,4 +1,5 @@
-import success1 from "./success1.mp3";
+import bonus from "./bonus.mp3";
+import success from "./success.mp3";
 import try_again from "./try_again.mp3";
 
-export { success1, try_again };
+export { bonus, success, try_again };

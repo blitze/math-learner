@@ -13,6 +13,7 @@ import RemainingTime from "./RemainingTime";
 import InputAnswer from "./InputAnswer";
 import MissingAnswer from "./MissingAnswer";
 import MultiChoiceAnswer from "./MultiChoiceAnswer";
+import { bonus as bonusSound } from "../sounds";
 
 type Props = {
 	settings: Settings;
@@ -76,6 +77,7 @@ function Questions({ settings, gameData, updateGameData }: Props) {
 						// exponentially add bonus points for every 5 in a row
 						if (inARow % 5 === 0) {
 							bonus += Math.floor(inARow / 5) * 50;
+							new Audio(bonusSound).play();
 						}
 					} else {
 						inARow = 0;

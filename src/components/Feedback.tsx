@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTimeout } from "usehooks-ts";
 import { feedbackMsgs, RandomItem } from "../utils";
 import * as sounds from "../sounds";
@@ -8,20 +8,15 @@ type Props = {
 };
 
 export default function Feedback({ msgCode }: Props) {
-	const [message, setMessage] = useState<string>(() =>
-		msgCode !== undefined
-			? RandomItem<string>(feedbackMsgs[msgCode as keyof typeof feedbackMsgs])
-			: ""
-	);
-
-	useEffect(() => {
-		if (msgCode && message) {
-			const audioTune = new Audio(
-				msgCode > 4 ? sounds.success1 : sounds.try_again
+	const [message, setMessage] = useState<string>(() => {
+		if (msgCode !== undefined) {
+			new Audio(msgCode > 4 ? sounds.success : sounds.try_again).play();
+			return RandomItem<string>(
+				feedbackMsgs[msgCode as keyof typeof feedbackMsgs]
 			);
-			audioTune.play();
 		}
-	}, [msgCode, message]);
+		return "";
+	});
 
 	const hide = () => setMessage("");
 
