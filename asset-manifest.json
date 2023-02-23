@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/math-learner/static/css/main.709d2454.css",
-    "main.js": "/math-learner/static/js/main.af11d61e.js",
+    "main.js": "/math-learner/static/js/main.072e2eba.js",
     "static/js/787.cd363669.chunk.js": "/math-learner/static/js/787.cd363669.chunk.js",
     "service-worker.js": "/math-learner/service-worker.js",
     "static/media/bonus.mp3": "/math-learner/static/media/bonus.5a63bc474f5aedfa5dbf.mp3",
@@ -10,11 +10,11 @@
     "static/media/logo.svg": "/math-learner/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/math-learner/index.html",
     "main.709d2454.css.map": "/math-learner/static/css/main.709d2454.css.map",
-    "main.af11d61e.js.map": "/math-learner/static/js/main.af11d61e.js.map",
+    "main.072e2eba.js.map": "/math-learner/static/js/main.072e2eba.js.map",
     "787.cd363669.chunk.js.map": "/math-learner/static/js/787.cd363669.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.709d2454.css",
-    "static/js/main.af11d61e.js"
+    "static/js/main.072e2eba.js"
   ]
 }
