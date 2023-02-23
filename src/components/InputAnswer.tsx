@@ -15,7 +15,7 @@ export default function InputAnswer({ value, checkAnswer }: Props) {
 	const handleSubmit = (e: React.FormEvent<InputAnswerFormElement>) => {
 		e.preventDefault();
 		const input = +e.currentTarget.elements.answer.value.trim();
-		if (input) {
+		if (!isNaN(input)) {
 			checkAnswer(input);
 			e.currentTarget.elements.answer.value = "";
 		}

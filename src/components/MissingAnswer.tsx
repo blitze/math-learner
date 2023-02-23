@@ -32,7 +32,7 @@ export default function MissingAnswer({
 	const handleSubmit = (e: React.FormEvent<InputAnswerFormElement>) => {
 		e.preventDefault();
 		const input = +e.currentTarget.elements.answer.value.trim();
-		if (input) {
+		if (!isNaN(input)) {
 			checkAnswer(input);
 			e.currentTarget.elements.answer.value = "";
 		}

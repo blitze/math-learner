@@ -64,7 +64,7 @@ export default function StatsView({ user, profiles, changeUser }: Props) {
 										)}
 										<div
 											className={`mx-1 py-2 shadow${
-												timestamp != data.timestamp ? " hidden" : ""
+												timestamp !== data.timestamp ? " hidden" : ""
 											}`}
 										>
 											<SessionStats
